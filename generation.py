@@ -27,6 +27,7 @@ while not has_entrance:#Make sure this creates an entrance
             dungeon_map[0][index] = Room(True, rand.choice([True, False]), rand.choice([True, False]), rand.choice([True, False]), True, False)#Generate a room with a top door (entrance), and randomly give it a left, right, and/or bottom door
             has_entrance = True#Show in program that entrance has been created
             rooms += 1#Update room count
+            print("Entrance has been generated at coords (0, %i).  There are now %i rooms." % (index, rooms))#Print the location of the room to console.
             break#Instantly exit the loop for good measure
 
 #Next, generate all the other necessary rooms
@@ -46,38 +47,47 @@ while not has_boss:#Run as long as there is no boss
                             dungeon_map[index_y][index_x] = Room(True, rand.choice([True, False]), True, rand.choice([True, False]), False, True)#Generate a boss room that has a top door and a left door, and randomly give it a right and/or bottom door
                             rooms += 1#Update room count
                             has_boss = True#Dungeon has boss room now
+                            print("Boss room has been generated at coords (%i, %i).  There are now %i rooms." % (index_x, index_y, rooms))
                             break#Exit loop for good measure
                         elif not dungeon_map[index_y - 1][index_x] == 0:#If not, but if there is a room above the current map index...
                             dungeon_map[index_y][index_x] = Room(True, rand.choice([True, False]), False, rand.choice([True, False]), False, True)#Generate a boss room that has a top door, randomly give it a right and/or bottom door, and do not give it a left door
                             rooms += 1#Update room count
                             has_boss = True#Dungeon has boss room now
+                            print("Boss room has been generated at coords (%i, %i).  There are now %i rooms." % (index_x, index_y, rooms))
                             break#Exit loop for good measure
                         elif not dungeon_map[index_y][index_x - 1] == 0:#If not, but if there is a room to the left of the current map index...
                             dungeon_map[index_y][index_x - 1] = Room(False, rand.choice([True, False]), True, rand.choice([True, False]), False, True)#Generate a boss room that has a left door, randomly give it a right and/or bottom door, and do not give it a top door
                             rooms += 1#Update room count
                             has_boss = True#Dungeon has boss room now
+                            print("Boss room has been generated at coords (%i, %i).  There are now %i rooms." % (index_x, index_y, rooms))
                             break#Exit loop for good measure
                     else:
                         if not dungeon_map[index_y - 1][index_x] == 0 and not dungeon_map[index_y][index_x - 1] == 0:#If there is a room above and to the left of the current map index...
                             dungeon_map[index_y][index_x] = Room(True, rand.choice([True, False]), True, rand.choice([True, False]), False, False)#Generate a room that has a top door and a left door, and randomly give it a right and/or bottom door
                             rooms += 1#Update room count
+                            print("Room has been generated at coords (%i, %i).  There are now %i rooms." % (index_x, index_y, rooms))
                         elif not dungeon_map[index_y - 1][index_x] == 0:#If not, but if there is a room above the current map index...
                             dungeon_map[index_y][index_x] = Room(True, rand.choice([True, False]), False, rand.choice([True, False]), False, False)#Generate a room that has a top door, randomly give it a right and/or bottom door, and do not give it a left door
                             rooms += 1#Update room count
+                            print("Room has been generated at coords (%i, %i).  There are now %i rooms." % (index_x, index_y, rooms))
                         elif not dungeon_map[index_y][index_x - 1] == 0:  # If not, but if there is a room to the left of the current map index...
                             dungeon_map[index_y][index_x - 1] = Room(False, rand.choice([True, False]), True, rand.choice([True, False]), False, False)#Generate a room that has a left door, randomly give it a right and/or bottom door, and do not give it a top door
                             rooms += 1#Update room count
+                            print("Room has been generated at coords (%i, %i).  There are now %i rooms." % (index_x, index_y, rooms))
             else:#Copy-paste of above code, except rooms are guaranteed to not be boss rooms
                 if dungeon_map[index_y][index_x] == 0:#If the map index is empty...
                     if not dungeon_map[index_y - 1][index_x] == 0 and not dungeon_map[index_y][index_x - 1] == 0:#If there is a room above and to the left of the current map index...
                         dungeon_map[index_y][index_x] = Room(True, rand.choice([True, False]), True, rand.choice([True, False]), False, False)#Generate a room that has a top door and a left door, and randomly give it a right and/or bottom door
                         rooms += 1#Update room count
+                        print("Room has been generated at coords (%i, %i).  There are now %i rooms." % (index_x, index_y, rooms))
                     elif not dungeon_map[index_y - 1][index_x] == 0:#If not, but if there is a room above the current map index...
                         dungeon_map[index_y][index_x] = Room(True, rand.choice([True, False]), False, rand.choice([True, False]), False, False)#Generate a room that has a top door, randomly give it a right and/or bottom door, and do not give it a left door
                         rooms += 1#Update room count
+                        print("Room has been generated at coords (%i, %i).  There are now %i rooms." % (index_x, index_y, rooms))
                     elif not dungeon_map[index_y][index_x - 1] == 0:#If not, but if there is a room to the left of the current map index...
                         dungeon_map[index_y][index_x - 1] = Room(False, rand.choice([True, False]), True, rand.choice([True, False]), False, False)#Generate a room that has a left door, randomly give it a right and/or bottom door, and do not give it a top door
                         rooms += 1#Update room count
+                        print("Room has been generated at coords (%i, %i).  There are now %i rooms." % (index_x, index_y, rooms))
 
 #Next, print it
 for index_y in range(len(dungeon_map)):#Y loop
@@ -90,6 +100,6 @@ for index_y in range(len(dungeon_map)):#Y loop
             else:
                 print('X', end='')#Print X if it's just a normal room
         else:
-            print(' ', end='')#Print a space if there's no room there
+            print('-', end='')#Print a dash if there's no room there
     
     print("\n")#Print a new line (hopefully it will look like a grid)
