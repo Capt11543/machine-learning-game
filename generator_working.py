@@ -1,12 +1,12 @@
 import random as ra
 import numpy as np
 
+# FIXME: make it so this can run multiple times
+
 # game settings
 width, height = 8, 8
 rooms = 0  # Room count
-max_rooms = 32  # Max rooms allowed in the dude
 counter_dude = 0
-current_room = [0, 0]  # Used in interior generation
 
 max_rooms = int((width * height) / 2)  # I think half is about the sweet spot, going lower tends to break it
 
@@ -20,7 +20,6 @@ how_snakey = 0  # decides where "marker rooms" will be
 # chooses an entrance
 current_room = [0, ra.randint(1, height - 1)]
 dungeon[current_room[0]][current_room[1]] = 2
-
 
 # bossin' it up baby
 dungeon[width - 1][ra.randint(0, height - 1)] = 3
@@ -83,9 +82,7 @@ while rooms < max_rooms and counter_dude < 10:
 
 if "n't" not in ra.choice(["rotate", "rotaten't"]):  # randomly decides whether or not to rotate the map
     dungeon = np.rot90(dungeon)
-    for x in range(len(dungeon)):
-        for y in range(len(dungeon[x])):
-            if dungeon[x][y] == 2:
-                current_room = [x, y]
-
-
+for x in range(len(dungeon)):
+    for y in range(len(dungeon[x])):
+        if dungeon[x][y] == 2:
+            current_room = [x, y]
