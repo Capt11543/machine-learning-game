@@ -236,11 +236,11 @@ def draw_game():
             # if there's a suggestion, go near it, otherwise, move randomly (randomly will be replace with ml stuff
             # FIXME: make this do different behaviors depending on suggestiong type
             if len(game_win.find_withtag("suggestion")) > 0:
-                current_cors = sug_step(current_cors[0], current_cors[1], sug_x, sug_y, sug_type, 1)
+                current_cors = Hero.sug_step(current_cors[0], current_cors[1], sug_x, sug_y, sug_type, 1)
                 if current_cors[0] == sug_x and current_cors[1] == sug_y:
                     game_win.delete("suggestion")
             else:
-                current_cors = rand_step(current_cors[0], current_cors[1], 1)
+                current_cors = Hero.rand_step(current_cors[0], current_cors[1], 1)
             game_win.coords("dude", current_cors[0], current_cors[1])
 
             # are you in a door? is the door open? then go through it
