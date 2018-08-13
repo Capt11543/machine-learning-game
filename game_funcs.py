@@ -1,4 +1,4 @@
-from generator_working import dungeon as map
+from generator import dungeon as map
 
 
 def room_walls(xcor, ycor):
