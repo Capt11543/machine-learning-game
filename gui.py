@@ -3,7 +3,7 @@ import time as tm
 import os
 import sys
 
-from generator import layro  # I did this because apparently, when we import everything from game_funcs, we import everything that game_funcs imported, including importing dungeon_map as map from generator.
+from generator_working import *
 from creatures import *
 from game_funcs import *
 
@@ -42,6 +42,7 @@ except FileNotFoundError:
 
 offset = {"x": -185, "y": -20}
 
+
 # makes the settings the ones in the folder
 for line in file:
     if "move_to" in line:
@@ -54,6 +55,7 @@ for line in file:
         offset["x"] = int(line[-5:])
     if "y_offset" in line:
         offset["y"] = int(line[-5:])
+
 
 # FIXME: not sure why the above is in gui, is there a better place?
 
@@ -96,12 +98,11 @@ def draw_game():
 
         # draws the map, temporary for now, soon it'll just show discovered rooms
         # FIXME: any way you could make it just discovered rooms?
-        # FIXME: We should also indicate which room the player is in; make the number green?
-        for xcor in range(len(map)):
-            del temp_map[:]  # Only meant to store one row of the map
-            for ycor in map[xcor]:
-                temp_map.append(str(int(ycor.room_type)))
-            dung_map.insert("end", temp_map)  # Add the row stored in temp_map to the main dung_map
+        for xcor in range(len(dungeon)):
+            del temp_map[:]
+            for ycor in dungeon[xcor]:
+                temp_map.append(str(int(ycor)))
+            dung_map.insert("end", temp_map)
         dung_map.place(relx=.888, rely=0.037)
 
         # makes the actual game window, with sides representing the game walls
@@ -111,6 +112,7 @@ def draw_game():
         def draw_dung(left_d, right_d, bot_d, top_d):
 
             # checks if there is a door on each side of the room
+            global top_wall, bot_wall, left_wall, right_wall
 
             game_win.delete("wall")
 
@@ -127,14 +129,25 @@ def draw_game():
             game_win.create_line(699, 0, 699, 180, fill="white")
             game_win.create_line(699, 300, 699, 479, fill="white")
 
-            if not top_d or layro.map_x == 0:
-                game_win.create_line(250, 0, 450, 0, fill="white", tags="wall")
+            if not top_d or layro.map_y == 0:
+                top_wall = game_win.create_line(250, 0, 450, 0, fill="white", tags="wall")
+            else:
+                top_wall = 0
+
             if not bot_d:
-                game_win.create_line(250, 479, 450, 479, fill="white", tags="wall")
-            if not left_d or layro.map_y == 0:
-                game_win.create_line(0, 180, 0, 300, fill="white", tags="wall")
+                bot_wall = game_win.create_line(250, 479, 450, 479, fill="white", tags="wall")
+            else:
+                bot_wall = 0
+
+            if not left_d or layro.map_x == 0:
+                left_wall = game_win.create_line(0, 180, 0, 300, fill="white", tags="wall")
+            else:
+                left_wall = 0
+
             if not right_d:
-                game_win.create_line(699, 180, 699, 300, fill="white", tags="wall")
+                right_wall = game_win.create_line(699, 180, 699, 300, fill="white", tags="wall")
+            else:
+                right_wall = 0
 
         draw_dung(left, right, bot, top)
 
@@ -188,11 +201,10 @@ def draw_game():
 
         # FIXME: make this delete things with the room-specific tag, and delete their associated object instances
         def change_rooms():
-            locations.config(text="locations: (" + str(layro.map_x) + "," + str(layro.map_y) + ")")
+            locations.config(text="locations: (" + str(layro.map_y) + "," + str(layro.map_x) + ")")
             game_win.delete("room-specific")
             global left, right, bot, top
             left, right, bot, top = room_walls(layro.map_x, layro.map_y)
-            print(room_walls(layro.map_x, layro.map_y))
             draw_dung(left, right, bot, top)
 
         # Binds all the buttons in settings.txt to their respective commands
@@ -236,24 +248,24 @@ def draw_game():
 
             # are you in a door? is the door open? then go through it
             if 450 > layro.posx > 250:
-                if 490 > layro.posy > 470 and bot:
+                if 490 > layro.posy > 470 and bot_wall not in game_win.find_all():
                     layro.map_x += 1
                     layro.posx, layro.posy = layro.posx, 100.0
                     game_win.delete("target")
                     change_rooms()
-                if 20 > layro.posy > -10 and top:
+                if 20 > layro.posy > -10 and top_wall not in game_win.find_all():
                     layro.map_x -= 1
                     layro.posx, layro.posy = layro.posx, 100.0
                     game_win.delete("target")
                     change_rooms()
 
             if 300 > layro.posy > 180:
-                if 710 > layro.posx > 690 and right:
+                if 710 > layro.posx > 690 and right_wall not in game_win.find_all():
                     layro.map_y += 1
                     layro.posx, layro.posy = 100.0, layro.posy
                     game_win.delete("target")
                     change_rooms()
-                if 20 > layro.posx > -10 and left:
+                if 20 > layro.posx > -10 and left_wall not in game_win.find_all():
                     layro.map_y -= 1
                     layro.posx, layro.posy = 600.0, layro.posy
                     game_win.delete("target")

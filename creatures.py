@@ -1,5 +1,6 @@
 import random as ra
 
+
 class Hero:
 
     # FIXME: maybe add a gear varaible? not sure how to handle that
@@ -38,7 +39,6 @@ class Hero:
         up, down, left, right = False, False, False, False
 
         if sugtype == "MoveTo":
-
             if self.posx > sugx:
                 left = True
             elif self.posx < sugx:
@@ -67,34 +67,7 @@ class Hero:
             else:
                 return self.posx, self.posy
 
-            if posx > sugx:
-                left = True
-            elif posx < sugx:
-                right = True
-            if posy > sugy:
-                up = True
-            elif posy < sugy:
-                down = True
 
-            if right and up:
-                return posx + scale, posy - scale
-            elif left and up:
-                return posx - scale, posy - scale
-            elif right and down:
-                return posx + scale, posy + scale
-            elif left and down:
-                return posx - scale, posy + scale
-            elif left:
-                return posx - scale, posy
-            elif right:
-                return posx + scale, posy
-            elif up:
-                return posx, posy - scale
-            elif down:
-                return posx, posy + scale
-            else:
-                return posx, posy
- 
 class Goblin:
 
     symbol = "G"
