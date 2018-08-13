@@ -1,29 +1,26 @@
 import random as ra
 import numpy as np
+from creatures import Hero
 
-# FIXME: make it so this can run multiple times
+width, height = 8, 8
 
 # game settings
-width, height = 8, 8
 rooms = 0  # Room count
 counter_dude = 0
 
 max_rooms = int((width * height) / 2)  # I think half is about the sweet spot, going lower tends to break it
 
-# generates a 2d grid with dimensions (width, height
+# generates a 2d grid with dimensions (width, height)
 dungeon = np.zeros([width, height])
 
 # things to help with computation
 room_cors = []  # stores "marker rooms"
-how_snakey = 0  # decides where "marker rooms" will be
 
 # chooses an entrance
-current_room = [0, ra.randint(1, height - 1)]
-dungeon[current_room[0]][current_room[1]] = 2
+dungeon[0, ra.randint(1, height - 1)] = 2
 
 # bossin' it up baby
 dungeon[width - 1][ra.randint(0, height - 1)] = 3
-
 
 '''
 the code below makes some "marker points"
@@ -37,7 +34,6 @@ for x in range(1, width - 1):
         how_snakey = ra.randint(1, width - 1)
         dungeon[x][how_snakey] = 1
         room_cors.append([x, how_snakey])
-
 
 '''
 then we take those markers, and e x p a n d them up one
@@ -53,7 +49,6 @@ for y in range(height):
         if dungeon[y][x] == 2:
             dungeon[y + 1][x] = 1
 
-
 '''
 then we expand each room that's above a marker by one
 '''
@@ -61,7 +56,6 @@ for y in range(height - 1):
     for x in range(width - 1):
         if dungeon[x][y] == 1 and not [x, y] in room_cors:
             dungeon[x][y + 1] = 1
-
 
 '''
 then, we splash in a couple random dudes so there's multiple paths to take, not all good ;)
@@ -85,4 +79,56 @@ if "n't" not in ra.choice(["rotate", "rotaten't"]):  # randomly decides whether 
 for x in range(len(dungeon)):
     for y in range(len(dungeon[x])):
         if dungeon[x][y] == 2:
-            current_room = [x, y]
+            layro = Hero(x, y)
+
+
+def regenerate(w, h):
+
+    global max_rooms, dungeon, room_cors, how_snakey, counter_dude, rooms
+    max_rooms = int((w * h) / 2)  # I think half is about the sweet spot, going lower tends to break it
+
+    # generates a 2d grid with dimensions (width, height)
+    dungeon = np.zeros([width, height])
+
+    # things to help with computation
+    room_cors = []  # stores "marker rooms"
+
+    # chooses an entrance
+    dungeon[0, ra.randint(1, height - 1)] = 2
+
+    # bossin' it up baby
+    dungeon[width - 1][ra.randint(0, height - 1)] = 3
+
+    for xpos in range(1, width - 1):
+        if xpos % 2 == 0:
+            how_snakey = ra.randint(1, width - 1)
+            dungeon[xpos][how_snakey] = 1
+            room_cors.append([xpos, how_snakey])
+
+    for ypos in range(height):
+        for xpos in range(width):
+            if ([xpos, ypos]) in room_cors:
+                dungeon[xpos - 1][ypos] = 1
+            if dungeon[ypos][xpos] == 3:
+                dungeon[ypos - 1][xpos] = 1
+            if dungeon[ypos][xpos] == 2:
+                dungeon[ypos + 1][xpos] = 1
+
+    for ypos in range(height - 1):
+        for xpos in range(width - 1):
+            if dungeon[xpos][ypos] == 1 and not [xpos, ypos] in room_cors:
+                dungeon[xpos][ypos + 1] = 1
+
+    while rooms < max_rooms and counter_dude < 10:
+        counter_dude += 1
+        for ypos in range(1, height - 1):
+            for xpos in range(1, width - 1):
+                rooms = np.count_nonzero(dungeon)
+                if dungeon[xpos][ypos - 1] == 1 and dungeon[xpos][ypos] == 0:
+                    if ra.randrange(0, 10) > 4:
+                        dungeon[xpos][ypos] = 1
+                if dungeon[xpos - 1][ypos] == 1 and dungeon[xpos][ypos] == 0:
+                    if ra.randrange(0, 10) > 4:
+                        dungeon[xpos][ypos] = 1
+                if rooms >= max_rooms:
+                    break

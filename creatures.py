@@ -2,33 +2,71 @@ import random as ra
 
 class Hero:
 
-    # FIXME: replace current_cors tuple with variables in the hero class
     # FIXME: maybe add a gear varaible? not sure how to handle that
 
     symbol = "☺"
+    posx = 300
+    posy = 300
+    map_x = 0
+    map_y = 0
     # These values should be treated as placeholders for now, and later we'll allow the player to create a character.
     health = 100
     attack = 5
     defense = 10
 
-    def rand_step(posx, posy, scale):
+    def __init__(self, x, y):
+
+        self.map_x = x
+        self.map_y = y
+
+    def rand_step(self):
+
         next_move = ra.choice(["up", "down", "left", "right", "nothing"])
         if next_move == "up":
-            return posx, posy + scale
+            return self.posx, self.posy + 1
         if next_move == "down":
-            return posx, posy - scale
+            return self.posx, self.posy - 1
         if next_move == "left":
-            return posx - scale, posy
+            return self.posx - 1, self.posy
         if next_move == "right":
-            return posx + scale, posy
+            return self.posx + 1, self.posy
         if next_move == "nothing":
-            return posx, posy
+            return self.posx, self.posy
 
-    def sug_step(posx, posy, sugx, sugy, sugtype, scale):
+    def sug_step(self, sugx, sugy, sugtype):
 
         up, down, left, right = False, False, False, False
 
         if sugtype == "MoveTo":
+
+            if self.posx > sugx:
+                left = True
+            elif self.posx < sugx:
+                right = True
+            if self.posy > sugy:
+                up = True
+            elif self.posy < sugy:
+                down = True
+
+            if right and up:
+                return self.posx + 1, self.posy - 1
+            elif left and up:
+                return self.posx - 1, self.posy - 1
+            elif right and down:
+                return self.posx + 1, self.posy + 1
+            elif left and down:
+                return self.posx - 1, self.posy + 1
+            elif left:
+                return self.posx - 1, self.posy
+            elif right:
+                return self.posx + 1, self.posy
+            elif up:
+                return self.posx, self.posy - 1
+            elif down:
+                return self.posx, self.posy + 1
+            else:
+                return self.posx, self.posy
+
             if posx > sugx:
                 left = True
             elif posx < sugx:
@@ -56,11 +94,11 @@ class Hero:
                 return posx, posy + scale
             else:
                 return posx, posy
-
-
+ 
 class Goblin:
 
     symbol = "G"
+    type = "Goblin"
     health = 100
     attack = 10
     defense = 5

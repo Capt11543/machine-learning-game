@@ -1,8 +1,6 @@
-import random as ra
 from generator_working import dungeon
 
 
-# FIXME: This is probably where to look to fix the ghost left door
 
 def room_walls(xcor, ycor):
     top = True
