@@ -140,3 +140,13 @@ def regenerate(w, h):
                         dungeon[xpos][ypos] = 1
                 if rooms >= max_rooms:
                     break
+                    
+        dungeon_map = []
+    for y in range(len(dungeon)):
+        map_row=[]
+        for x in range(len(dungeon[y])):
+            map_row.append(Room(x, y, dungeon[x][y]))
+        dungeon_map.append(map_row)
+        
+    if "n't" not in ra.choice(["rotate", "rotaten't"]):  # randomly decides whether or not to rotate the map
+        dungeon = np.rot90(dungeon)
