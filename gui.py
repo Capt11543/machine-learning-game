@@ -3,7 +3,7 @@ import time as tm
 import os
 import sys
 
-from generator_working import *
+from generator import *
 from creatures import *
 from game_funcs import *
 
@@ -96,6 +96,7 @@ def draw_game():
 
         # draws the map, temporary for now, soon it'll just show discovered rooms
         # FIXME: any way you could make it just discovered rooms?
+        # FIXME: We should also indicate which room the player is in; make the number green?
         for xcor in range(len(dungeon)):
             del temp_map[:]
             for ycor in dungeon[xcor]:

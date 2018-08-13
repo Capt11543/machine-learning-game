@@ -1,6 +1,4 @@
-from generator_working import dungeon
-
-
+from generator import dungeon
 
 def room_walls(xcor, ycor):
     top = True
