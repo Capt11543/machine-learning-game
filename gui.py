@@ -3,7 +3,7 @@ import time as tm
 import os
 import sys
 
-from generator import *
+from generator import layro  # I did this because apparently, when we import everything from game_funcs, we import everything that game_funcs imported, including importing dungeon_map as map from generator.
 from creatures import *
 from game_funcs import *
 
@@ -97,11 +97,11 @@ def draw_game():
         # draws the map, temporary for now, soon it'll just show discovered rooms
         # FIXME: any way you could make it just discovered rooms?
         # FIXME: We should also indicate which room the player is in; make the number green?
-        for xcor in range(len(dungeon)):
-            del temp_map[:]
-            for ycor in dungeon[xcor]:
-                temp_map.append(str(int(ycor)))
-            dung_map.insert("end", temp_map)
+        for xcor in range(len(map)):
+            del temp_map[:]  # Only meant to store one row of the map
+            for ycor in map[xcor]:
+                temp_map.append(str(int(ycor.room_type)))
+            dung_map.insert("end", temp_map)  # Add the row stored in temp_map to the main dung_map
         dung_map.place(relx=.888, rely=0.037)
 
         # makes the actual game window, with sides representing the game walls

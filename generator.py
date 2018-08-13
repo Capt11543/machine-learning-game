@@ -1,6 +1,7 @@
 import random as ra
 import numpy as np
 from creatures import Hero
+from room import *
 
 width, height = 8, 8
 
@@ -32,7 +33,7 @@ which randomly places it on a point every other row
 for x in range(1, width - 1):
     if x % 2 == 0:
         how_snakey = ra.randint(1, width - 1)
-        dungeon[x][how_snakey] = 1
+        dungeon[x][how_snakey] = 1  # Room(x, how_snakey, 1)
         room_cors.append([x, how_snakey])
 
 '''
@@ -76,11 +77,18 @@ while rooms < max_rooms and counter_dude < 10:
 
 if "n't" not in ra.choice(["rotate", "rotaten't"]):  # randomly decides whether or not to rotate the map
     dungeon = np.rot90(dungeon)
+
+dungeon_map = []
+for y in range(len(dungeon)):
+    map_row=[]
+    for x in range(len(dungeon[y])):
+        map_row.append(Room(x, y, dungeon[x][y]))
+    dungeon_map.append(map_row)
+
 for x in range(len(dungeon)):
     for y in range(len(dungeon[x])):
-        if dungeon[x][y] == 2:
+        if dungeon_map[x][y].room_type == 2:
             layro = Hero(x, y)
-
 
 def regenerate(w, h):
 

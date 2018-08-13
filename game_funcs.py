@@ -1,4 +1,4 @@
-from generator import dungeon
+from generator import dungeon_map as map
 
 def room_walls(xcor, ycor):
     top = True
@@ -7,22 +7,22 @@ def room_walls(xcor, ycor):
     right = True
 
     try:
-        if dungeon[xcor][ycor - 1] == 0:
+        if map[xcor][ycor - 1].room_type == 0:
             left = False
     except IndexError:
         left = False
     try:
-        if dungeon[xcor][ycor + 1] == 0:
+        if map[xcor][ycor + 1].room_type == 0:
             right = False
     except IndexError:
         right = False
     try:
-        if dungeon[xcor + 1][ycor] == 0:
+        if map[xcor + 1][ycor].room_type == 0:
             bot = False
     except IndexError:
         bot = False
     try:
-        if dungeon[xcor - 1][ycor] == 0:
+        if map[xcor - 1][ycor].room_type == 0:
             top = False
     except IndexError:
         top = False
