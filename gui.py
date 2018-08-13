@@ -42,7 +42,6 @@ except FileNotFoundError:
 
 offset = {"x": -185, "y": -20}
 
-
 # makes the settings the ones in the folder
 for line in file:
     if "move_to" in line:
@@ -55,7 +54,6 @@ for line in file:
         offset["x"] = int(line[-5:])
     if "y_offset" in line:
         offset["y"] = int(line[-5:])
-
 
 # FIXME: not sure why the above is in gui, is there a better place?
 
