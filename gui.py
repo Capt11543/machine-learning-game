@@ -3,7 +3,7 @@ import time as tm
 import os
 import sys
 
-from generator_working import *
+from generator import *
 from creatures import *
 from game_funcs import *
 
