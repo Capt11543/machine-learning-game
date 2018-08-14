@@ -102,8 +102,27 @@ def draw_game():
             del temp_map[:]
             for ycor in dungeon[xcor]:
                 temp_map.append(str(int(ycor)))
-            dung_map.insert("end", temp_map)
-        dung_map.place(relx=.888, rely=0.037)
+            dev_map.insert("end", temp_map)
+        dev_map.place(relx=.888, rely=0.41)
+
+        player_map.place(relx=.888, rely=0.037)
+
+        def draw_map():
+            for xpos in range(len(dungeon_map)):
+                for ypos, room in enumerate(dungeon_map[xpos]):
+                    if room.x_pos == layro.map_x and room.y_pos == layro.map_y:
+                        if not room.discovered:
+                            room.set_discovered(True)
+
+                    if room.discovered:
+                        if room.x_pos == layro.map_x and room.y_pos == layro.map_y:
+                            player_map.create_text((room.y_pos * 13) + 7, (room.x_pos * 13) + 7,
+                                                   text="X", fill="light green", tags="room")
+                        else:
+                            player_map.create_text((room.y_pos * 13) + 7, (room.x_pos * 13) + 7,
+                                                   text="X", fill="white", tags="room")
+
+        draw_map()
 
         # makes the actual game window, with sides representing the game walls
         game_win.place(relx=.18565, rely=0.037, height="480")
@@ -160,9 +179,9 @@ def draw_game():
         msg2.place(relx=.45, rely=-0.005)
 
         # FIXME: makes these a little prettier
-        health.place(relx=.89, rely=.39)
-        locations.place(relx=.89, rely=.43)
-        controls1.place(relx=.89, rely=.47)
+        health.place(relx=.89, rely=.26)
+        locations.place(relx=.89, rely=.3)
+        controls1.place(relx=.89, rely=.34)
 
         # Where the game loop starts, above is initialization and stuff
 
@@ -206,6 +225,7 @@ def draw_game():
             global left, right, bot, top
             left, right, bot, top = room_walls(layro.map_x, layro.map_y)
             draw_dung(left, right, bot, top)
+            draw_map()
 
         # Binds all the buttons in settings.txt to their respective commands
         master.bind(move_to_butt, move_to)
@@ -329,11 +349,12 @@ back_butt = tk.Button(master, text="Back", width=25, activebackground="black",
 quit_butt = tk.Button(master, text="Quit", width=25, activebackground="black",
                       activeforeground="white", command=master.destroy)
 
-
 console = tk.Listbox(master, bg="black", fg="white", selectmode="single", font=("times", 9), height="29", width="30")
 
-dung_map = tk.Listbox(master, bg="black", fg="white", selectmode="single", height="8", width="12", font=("times", 14),
-                      highlightthickness=0, relief="ridge", bd=0)
+dev_map = tk.Listbox(master, bg="black", fg="white", selectmode="single", height="8", width="12", font=("times", 14),
+                     highlightthickness=0, relief="ridge", bd=0)
+
+player_map = tk.Canvas(master, width=105, height=105, bg="black")
 
 game_win = tk.Canvas(master, width=700, height=480, bg="black", bd=0, highlightthickness=0, relief='ridge')
 
@@ -346,6 +367,7 @@ controls1 = tk.Message(master, text="create MoveTo: " + move_to_butt, bg="black"
 
 locations = tk.Message(master, text="locations: (" + str(layro.map_y) + "," + str(layro.map_x) + ")", bg="black",
                        fg="white", width="400")
+
 
 # gotta make sure the title is the first thing displayed
 dis_title()
