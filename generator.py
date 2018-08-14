@@ -80,7 +80,7 @@ if "n't" not in ra.choice(["rotate", "rotaten't"]):  # randomly decides whether 
 
 dungeon_map = []
 for y in range(len(dungeon)):
-    map_row=[]
+    map_row = []
     for x in range(len(dungeon[y])):
         map_row.append(Room(x, y, dungeon[x][y]))
     dungeon_map.append(map_row)
@@ -88,11 +88,12 @@ for y in range(len(dungeon)):
 for x in range(len(dungeon)):
     for y in range(len(dungeon[x])):
         if dungeon_map[x][y].room_type == 2:
-            layro = Hero(x, y)
+            layro = Hero(y, x)
+
 
 def regenerate(w, h):
 
-    global max_rooms, dungeon, room_cors, how_snakey, counter_dude, rooms
+    global max_rooms, dungeon, room_cors, how_snakey, counter_dude, rooms, dungeon_map, map_row
     max_rooms = int((w * h) / 2)  # I think half is about the sweet spot, going lower tends to break it
 
     # generates a 2d grid with dimensions (width, height)
@@ -143,7 +144,7 @@ def regenerate(w, h):
                     
         dungeon_map = []
     for y in range(len(dungeon)):
-        map_row=[]
+        map_row = []
         for x in range(len(dungeon[y])):
             map_row.append(Room(x, y, dungeon[x][y]))
         dungeon_map.append(map_row)
