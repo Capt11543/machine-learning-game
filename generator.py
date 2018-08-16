@@ -1,6 +1,6 @@
 import random as ra
 import numpy as np
-from creatures import Hero
+from creatures import *
 from room import *
 
 width, height = 8, 8
@@ -79,10 +79,10 @@ if "n't" not in ra.choice(["rotate", "rotaten't"]):  # randomly decides whether 
     dungeon = np.rot90(dungeon)
 
 dungeon_map = []
-for y in range(len(dungeon)):
+for ypos in range(len(dungeon)):
     map_row = []
-    for x in range(len(dungeon[y])):
-        map_row.append(Room(x, y, dungeon[x][y]))
+    for xpos in range(len(dungeon[ypos])):
+        map_row.append(Room(xpos, ypos, dungeon[xpos][ypos]))
     dungeon_map.append(map_row)
 
 for x in range(len(dungeon)):
@@ -143,10 +143,10 @@ def regenerate(w, h):
                     break
                     
         dungeon_map = []
-    for y in range(len(dungeon)):
+    for ypos in range(len(dungeon)):
         map_row = []
-        for x in range(len(dungeon[y])):
-            map_row.append(Room(x, y, dungeon[x][y]))
+        for xpos in range(len(dungeon[ypos])):
+            map_row.append(Room(xpos, ypos, dungeon[xpos][ypos]))
         dungeon_map.append(map_row)
         
     if "n't" not in ra.choice(["rotate", "rotaten't"]):  # randomly decides whether or not to rotate the map

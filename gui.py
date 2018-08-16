@@ -6,6 +6,7 @@ import sys
 from generator import *
 from creatures import *
 from game_funcs import *
+from creatures import Hero
 
 # Configuring the window, should be self-explanatory
 master = tk.Tk()
@@ -65,6 +66,8 @@ def draw_game():
         left, right, bot, top = room_walls(layro.map_x, layro.map_y)
 
         temp_map = []
+        enemies = []
+        enemy_sprites = []
         button.pack_forget()
         title_screen.pack_forget()
         options_butt.pack_forget()
@@ -96,8 +99,7 @@ def draw_game():
 
             console.update()
 
-        # draws the map, temporary for now, soon it'll just show discovered rooms
-        # FIXME: any way you could make it just discovered rooms?
+        # draws the map
         for xcor in range(len(dungeon)):
             del temp_map[:]
             for ycor in dungeon[xcor]:
@@ -108,8 +110,8 @@ def draw_game():
         player_map.place(relx=.888, rely=0.037)
 
         def draw_map():
-            for xpos in range(len(dungeon_map)):
-                for ypos, room in enumerate(dungeon_map[xpos]):
+            for x_pos in range(len(dungeon_map)):
+                for y_pos, room in enumerate(dungeon_map[x_pos]):
                     if room.x_pos == layro.map_x and room.y_pos == layro.map_y:
                         if not room.discovered:
                             room.set_discovered(True)
@@ -178,7 +180,6 @@ def draw_game():
         msg1.place(relx=.92, rely=-0.005)
         msg2.place(relx=.45, rely=-0.005)
 
-        # FIXME: makes these a little prettier
         health.place(relx=.89, rely=.26)
         locations.place(relx=.89, rely=.3)
         controls1.place(relx=.89, rely=.34)
@@ -212,7 +213,23 @@ def draw_game():
         # FIXME: make this attack the selected target, with a visual indicator
 
         def attack(event):
-            print(event.x, event.y, "attack")
+
+            game_win.delete("attack")
+
+            for item in game_win.find_withtag("enemy"):
+                if item in game_win.find_overlapping(event.x - 3 + offset["x"],
+                                                     event.y - 3 + offset["y"],
+                                                     event.x + 3 + offset["x"],
+                                                     event.y + 3 + offset["y"]):
+
+                    game_win.create_rectangle(game_win.coords(item)[0] - 10,
+                                              game_win.coords(item)[1] - 10,
+                                              game_win.coords(item)[0] + 10,
+                                              game_win.coords(item)[1] + 10,
+                                              outline="red", dash=(2, 6), tags=("attack", "room-specific"))
+                    global att_x, att_y
+                    att_x = (game_win.coords("attack")[0] + game_win.coords("attack")[2]) / 2
+                    att_y = (game_win.coords("attack")[1] + game_win.coords("attack")[3]) / 2
 
         # FIXME: make this pick up the selected item, with visual indicator
         def interact(event):
@@ -226,42 +243,41 @@ def draw_game():
             left, right, bot, top = room_walls(layro.map_x, layro.map_y)
             draw_dung(left, right, bot, top)
             draw_map()
+            for x_pos in range(len(dungeon_map)):
+                for y_pos, room in enumerate(dungeon_map[x_pos]):
+                    if room.x_pos == layro.map_x and room.y_pos == layro.map_y:
+                        if "gob_pos1" in room.contents:
+                            enemies.append(Goblin(enemies, layro))
+                            enemy_sprites.append(game_win.create_text(enemies[len(enemies) - 1].xpos,
+                                                                      enemies[len(enemies) - 1].ypos,
+                                                                      text=enemies[len(enemies) - 1].symbol,
+                                                                      fill="light green",
+                                                                      tags=("goblin", "enemy", "room-specific",)))
 
         # Binds all the buttons in settings.txt to their respective commands
         master.bind(move_to_butt, move_to)
         master.bind(attack_this_butt, attack)
         master.bind(interact_with, interact)
 
-        # makes a Goblin named gob1
-        gob1 = Goblin()
-        gobbo = game_win.create_text(gob1.xpos, gob1.ypos, text=gob1.symbol, fill="light green",
-                                     tags=("goblin", "enemy", "room-specific", gob1.type))
         while game:
-
-            # checks if layro is overlapping in gobbo sight
-            if not gob1.chasing and dude in game_win.find_overlapping(gob1.xpos - gob1.range / 4,
-                                                                      gob1.ypos - gob1.range / 4,
-                                                                      gob1.xpos + gob1.range / 4,
-                                                                      gob1.ypos + gob1.range / 4,):
-
-                # make gob1 angry if he sees layro
-                game_win.itemconfig(gobbo, fill="red")
-                gob1.chasing = True
-                game_win.coords(gobbo, Goblin.chase(gob1, layro.posx, layro.posy))
-
-            # If the goblin is angry, he chases layro
-            if gob1.chasing:
-                game_win.coords(gobbo, Goblin.chase(gob1, layro.posx, layro.posy))
-                gob1.xpos, gob1.ypos = Goblin.chase(gob1, layro.posx, layro.posy)
 
             tm.sleep(.01)
 
+            for z, q in zip(enemies, enemy_sprites):
+                try:
+                    if z.map_x == layro.map_x and z.map_y == layro.map_y:
+                        z.behavior(q, dude, game_win, layro)
+                except NameError or ValueError:
+                        pass
+
             # if there's a suggestion, go near it, otherwise, move randomly (randomly will be replace with ml stuff
             # FIXME: make this do different behaviors depending on suggestion type
-            if len(game_win.find_withtag("suggestion")) > 0:
-                layro.posx, layro.posy = layro.sug_step(sug_x, sug_y, sug_type)
+            if len(game_win.find_withtag("target")) > 0:
+                layro.posx, layro.posy = layro.sug_step(sug_x, sug_y, "MoveTo")
                 if layro.posx == sug_x and layro.posy == sug_y:
-                    game_win.delete("suggestion")
+                    game_win.delete("target")
+            elif len(game_win.find_withtag("attack")) > 0:
+                layro.posx, layro.posy = layro.sug_step(att_x, att_y, "AttackThis")
             else:
                 layro.posx, layro.posy = layro.rand_step()
             game_win.coords("dude", layro.posx, layro.posy)
@@ -303,6 +319,8 @@ def dis_options():
     options_butt.pack_forget()
     quit_butt.pack_forget()
 
+    test_window.place(x=400, y=100)
+
     back_butt.place(relx=0.0, rely=0.95)
 
     tk.mainloop()
@@ -313,6 +331,7 @@ def dis_title():
     # The title screen
 
     back_butt.place_forget()
+    test_window.place_forget()
 
     title_screen.pack(fill="x", pady=50)
     button.pack(fill="x", padx=master.winfo_width() / 4, pady=25)
@@ -367,6 +386,8 @@ controls1 = tk.Message(master, text="create MoveTo: " + move_to_butt, bg="black"
 
 locations = tk.Message(master, text="locations: (" + str(layro.map_y) + "," + str(layro.map_x) + ")", bg="black",
                        fg="white", width="400")
+
+test_window = tk.Canvas(master, width=700, height=480, bg="black")
 
 
 # gotta make sure the title is the first thing displayed

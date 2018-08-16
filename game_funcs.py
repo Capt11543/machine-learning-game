@@ -1,4 +1,4 @@
-from generator import dungeon
+from generator import *
 
 
 def room_walls(xcor, ycor):
@@ -29,3 +29,4 @@ def room_walls(xcor, ycor):
         top = False
 
     return left, right, bot, top
+
