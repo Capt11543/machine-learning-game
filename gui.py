@@ -251,8 +251,15 @@ def draw_game():
                             enemy_sprites.append(game_win.create_text(enemies[len(enemies) - 1].xpos,
                                                                       enemies[len(enemies) - 1].ypos,
                                                                       text=enemies[len(enemies) - 1].symbol,
-                                                                      fill="light green",
-                                                                      tags=("goblin", "enemy", "room-specific",)))
+                                                                      fill=enemies[len(enemies) - 1].color,
+                                                                      tags=("enemy", "room-specific",)))
+                        if "shade_pos1" in room.contents:
+                            enemies.append(Shade(enemies, layro))
+                            enemy_sprites.append(game_win.create_text(enemies[len(enemies) - 1].xpos,
+                                                                      enemies[len(enemies) - 1].ypos,
+                                                                      text=enemies[len(enemies) - 1].symbol,
+                                                                      fill=enemies[len(enemies) - 1].color,
+                                                                      tags=("enemy", "room-specific",)))
 
         # Binds all the buttons in settings.txt to their respective commands
         master.bind(move_to_butt, move_to)

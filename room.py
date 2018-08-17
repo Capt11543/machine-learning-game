@@ -24,6 +24,8 @@ class Room:
         if room_type == 1:
             if ra.randint(0, 5) == 4:
                 temp_contents.append("gob_pos1")
+            if not ra.randint(0, 5) == 7:
+                temp_contents.append("shade_pos1")
 
         self.contents = temp_contents
 
