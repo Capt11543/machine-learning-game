@@ -182,7 +182,6 @@ class Goblin:
                     att_x = (game_win.coords("attack")[0] + game_win.coords("attack")[2]) / 2
                     att_y = (game_win.coords("attack")[1] + game_win.coords("attack")[3]) / 2
 
-
 class Shade:
     symbol = "S"
     type = "Shade"
@@ -272,7 +271,3 @@ class Shade:
             game_win.coords(ghost, self.xpos, self.ypos)
             self.timer = 0
             self.visible = True
-
-
-
-
