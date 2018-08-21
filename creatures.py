@@ -14,6 +14,11 @@ class Hero:
     health = 100
     attack = 5
     defense = 10
+    equipped_weapon = "nothing"
+    equipped_armor = "nothing"
+    equipped_access = "nothing"
+    # can be one_square, surrounding, or range
+    attack_type = "one_square"
 
     def __init__(self, x, y, *args):
 

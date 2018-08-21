@@ -1,7 +1,7 @@
 import random as ra
 import numpy as np
-from creatures import *
-from room import *
+from creatures import Hero
+from room import Room
 
 width, height = 8, 8
 

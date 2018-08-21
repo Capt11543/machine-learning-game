@@ -1,12 +1,12 @@
 import tkinter as tk
-import time as tm
 import os
 import sys
+import re
 
-from generator import *
+from generator import layro, dungeon_map, dungeon, regenerate
 from creatures import *
-from game_funcs import *
-from creatures import Hero
+from game_funcs import room_walls
+from gear_selection import before_dungeon
 
 # Configuring the window, should be self-explanatory
 master = tk.Tk()
@@ -25,7 +25,7 @@ master.maxsize(int(master.winfo_width()), int(master.winfo_height()))
 setting_path = sys.path[0] + "\Data"
 
 try:
-    master.iconbitmap(setting_path + "\icon.ico")
+    master.iconbitmap(setting_path + "\Resources\icon.ico")
 except tk.TclError:
     pass
 
@@ -61,12 +61,20 @@ for line in file:
     if "interact_with" in line:
         interact_with = line[-2:].lower()
     if "x_offset" in line:
-        offset["x"] = int(line[-5:])
+        for x in reversed(range(5)):
+            try:
+                offset["x"] = int(line[-5:])
+                break
+            except ValueError:
+                continue
     if "y_offset" in line:
-        offset["y"] = int(line[-5:])
-    if line == "startup: True":
-        startup = True
-    if line == "startup: False":
+        for x in reversed(range(5)):
+            try:
+                offset["y"] = int(line[-5:])
+                break
+            except ValueError:
+                continue
+    if "startup: False" in line:
         startup = False
 
 if startup:
@@ -75,7 +83,9 @@ if startup:
 
     def start_up(*args):
         master.bind("<Return>", start_up)
-        global times
+
+        global times, file
+
         times += 1
         if times == 1:
             global startup_window, layro_startup, fake_window, plus, layro_startupp
@@ -163,15 +173,25 @@ if startup:
                     master.after(1, help_us)
                 else:
                     start_up()
-            help_us()
+            master.after(10, help_us)
 
         if times >= 15:
+            file.write("startup: False")
             startup_window.pack_forget()
 
     start_up()
+    file.close()
+
 
 
 # FIXME: not sure why the above is in gui, is there a better place?
+
+def before_game():
+    button.pack_forget()
+    title_screen.pack_forget()
+    options_butt.pack_forget()
+    quit_butt.pack_forget()
+    before_dungeon(tk, master, draw_game)
 
 
 def draw_game():
@@ -533,7 +553,7 @@ title_screen = tk.Message(master, text="The Game You Don't Play", bg="black",
                           fg="white", font=32, padx="0", justify="center")
 
 button = tk.Button(master, text='Play', width=25, activebackground="black",
-                   activeforeground="white", command=draw_game)
+                   activeforeground="white", command=before_game)
 
 options_butt = tk.Button(master, text='Options', width=25, activebackground="black",
                          activeforeground="white", command=dis_options)
