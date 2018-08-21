@@ -1,4 +1,4 @@
-from generator import *
+from generator import dungeon
 
 
 def room_walls(xcor, ycor):

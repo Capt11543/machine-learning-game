@@ -1,7 +1,7 @@
 import random as ra
 import numpy as np
-from creatures import *
-from room import *
+from creatures import Hero
+from room import Room
 
 width, height = 8, 8
 
@@ -93,10 +93,13 @@ for x in range(len(dungeon)):
 
 def regenerate(w, h):
 
-    global max_rooms, dungeon, room_cors, how_snakey, counter_dude, rooms, dungeon_map, map_row
+    global max_rooms, dungeon, room_cors, how_snakey, counter_dude, rooms, dungeon_map, map_row, layro
+    width, height = w, h
     max_rooms = int((w * h) / 2)  # I think half is about the sweet spot, going lower tends to break it
 
     # generates a 2d grid with dimensions (width, height)
+    dungeon = []
+    dungeon_map = []
     dungeon = np.zeros([width, height])
 
     # things to help with computation
@@ -141,13 +144,15 @@ def regenerate(w, h):
                         dungeon[xpos][ypos] = 1
                 if rooms >= max_rooms:
                     break
-                    
-        dungeon_map = []
+
+    dungeon_map = []
     for ypos in range(len(dungeon)):
         map_row = []
         for xpos in range(len(dungeon[ypos])):
             map_row.append(Room(xpos, ypos, dungeon[xpos][ypos]))
         dungeon_map.append(map_row)
-        
-    if "n't" not in ra.choice(["rotate", "rotaten't"]):  # randomly decides whether or not to rotate the map
-        dungeon = np.rot90(dungeon)
+
+    for y in range(len(dungeon)):
+        for x in range(len(dungeon[y])):
+            if dungeon_map[x][y].room_type == 2:
+                layro.map_x, layro.map_y = x, y

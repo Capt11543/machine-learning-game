@@ -1,12 +1,12 @@
 import tkinter as tk
-import time as tm
 import os
 import sys
+import re
 
-from generator import *
+from generator import layro, dungeon_map, dungeon, regenerate
 from creatures import *
-from game_funcs import *
-from creatures import Hero
+from game_funcs import room_walls
+from gear_selection import before_dungeon
 
 # Configuring the window, should be self-explanatory
 master = tk.Tk()
@@ -15,12 +15,19 @@ master.title("The Game You Don't Play")
 master.geometry("1000x500")
 master.update()
 
+startup = True
+
 # you can't change the window size
 master.minsize(int(master.winfo_width()), int(master.winfo_height()))
 master.maxsize(int(master.winfo_width()), int(master.winfo_height()))
 
 # sets the path for settings.txt as the current path + in a folder called Data
 setting_path = sys.path[0] + "\Data"
+
+try:
+    master.iconbitmap(setting_path + "\Resources\icon.ico")
+except tk.TclError:
+    pass
 
 # make the Data folder if it doesn't exist
 if not os.path.exists(setting_path):
@@ -53,15 +60,140 @@ for line in file:
     if "interact_with" in line:
         interact_with = line[-2:].lower()
     if "x_offset" in line:
-        offset["x"] = int(line[-5:])
+        for x in reversed(range(5)):
+            try:
+                offset["x"] = int(line[-5:])
+                break
+            except ValueError:
+                continue
     if "y_offset" in line:
-        offset["y"] = int(line[-5:])
+        for x in reversed(range(5)):
+            try:
+                offset["y"] = int(line[-5:])
+                break
+            except ValueError:
+                continue
+    if "startup: False" in line:
+        startup = False
+
+if startup:
+    global times
+    times = 0
+
+    def start_up(*args):
+        master.bind("<Return>", start_up)
+        global times, file
+        times += 1
+        if times == 1:
+            global startup_window, layro_startup, fake_window, plus, layro_startupp
+            startup_window = tk.Canvas(master, width=master.winfo_width(), height=master.winfo_height(), bg="black")
+            startup_window.pack()
+            startup_window.create_text(70, 12,
+                                       text="This is Layro: ", fill="white", font=("times", 15))
+            layro_startup = startup_window.create_text(130, 12, text=' ☺', fill="white", font=("times", 20), tags="layro_startup")
+        if times == 2:
+            startup_window.create_text(300, 12, text='Layro wants to be an adventurer', fill="white", font=("times", 15))
+
+        if times == 3:
+            startup_window.create_text(120, 40, text='Unfortunately, they suck at it', fill="white",
+                                       font=("times", 15))
+            startup_window.itemconfig(layro_startup, text=" ☹", font=("times", 28))
+        if times == 4:
+            startup_window.create_text(400, 40, text='Although, you can help them get better', fill="white",
+                                       font=("times", 15))
+            startup_window.itemconfig(layro_startup, text=' ☺', font=("times", 20))
+        if times == 5:
+            startup_window.create_text(115, 70, text="This is the game window", fill="white", font=("times", 15))
+            fake_window = tk.Canvas(master, width=master.winfo_width() / 4.5, height=master.winfo_height() / 4.5, bg="black")
+            fake_window.place(relx=.23, rely=.12)
+
+        if times == 6:
+            startup_window.create_text(115, 100, text="This is where Layro lives", fill="white", font=("times", 15))
+            layro_startupp = fake_window.create_text(master.winfo_width() / 9, master.winfo_height() / 9, text="☺", fill="white")
+
+        if times == 7:
+            plus = fake_window.create_text(master.winfo_width() / 6, master.winfo_height() / 9, text="+", fill="white")
+            startup_window.create_text(82, 140, text="You can press " + move_to_butt.capitalize(), fill="white", font=("times", 15))
+            startup_window.create_text(100, 160, text="to make Layro move", fill="white", font=("times", 15))
+        if times == 8:
+            def move_guy():
+                global layro_startupp, plus
+                if not int(fake_window.coords(layro_startupp)[0]) == int(fake_window.coords(plus)[0] - 30):
+                    fake_window.coords(layro_startupp, int(fake_window.coords(layro_startupp)[0] + 1), int(fake_window.coords(layro_startupp)[1]))
+                    fake_window.after(20, move_guy)
+                else:
+                    startup_window.create_text(135, 190, text="But sometimes, they won't listen", fill="white", font=("times", 15))
+            move_guy()
+        if times == 9:
+                def move_guy2():
+                    global layro_startupp, plus
+                    if not int(fake_window.coords(layro_startupp)[1]) == 120:
+                        fake_window.coords(layro_startupp, int(fake_window.coords(layro_startupp)[0]),
+                                           int(fake_window.coords(layro_startupp)[1]) + 1)
+                        fake_window.after(10, move_guy2)
+                    else:
+                        start_up()
+                move_guy2()
+        if times == 10:
+            fake_window.create_text(100, 50, text="G", fill="light green")
+            fake_window.create_text(150, 50, text="□", fill="white")
+            fake_window.delete(plus)
+            startup_window.create_text(90, 230, text="You can also use " + attack_this_butt.capitalize(), fill="white", font=("times", 15))
+            startup_window.create_text(300, 220, text="to tell them to attack something", fill="white", font=("times", 15))
+            fake_window.create_rectangle(90, 40, 110, 60, outline="red", dash=(2, 6), tags="fuck")
+        if times == 11:
+            fake_window.delete("fuck")
+            startup_window.create_text(90, 265, text="You can also use " + interact_with.capitalize(), fill="white",
+                                       font=("times", 15))
+            startup_window.create_text(330, 256, text="to tell them to interact with something", fill="white",
+                                       font=("times", 15))
+        if times == 12:
+            startup_window.delete("all")
+            startup_window.create_text(90, 270, text="But be careful", fill="white",
+                                       font=("times", 15))
+        if times == 13:
+            startup_window.create_text(90, 290, text="This castle", fill="white",
+                                       font=("times", 15))
+            fake_window.create_rectangle(140, 40, 160, 60, outline="yellow", dash=(2, 6))
+
+        if times == 14:
+            startup_window.create_text(100, 310, text="Contains dark secrets", fill="white",
+                                       font=("times", 15))
+            master.unbind("<Return>")
+            fake_window.place_forget()
+
+            def help_us():
+                for i in range(100):
+                    startup_window.create_text(ra.randint(0, master.winfo_width()), ra.randint(0, master.winfo_height()), text="help us", fill="white",
+                                                          font=("times", 15), tags="help")
+                if not len(startup_window.find_withtag("help")) > 1500:
+                    master.after(1, help_us)
+                else:
+                    start_up()
+            master.after(10, help_us)
+
+        if times >= 15:
+            file.write("startup: False")
+            startup_window.pack_forget()
+
+    start_up()
+    file.close()
 
 
 # FIXME: not sure why the above is in gui, is there a better place?
 
+def before_game():
+    button.pack_forget()
+    title_screen.pack_forget()
+    options_butt.pack_forget()
+    quit_butt.pack_forget()
+    before_dungeon(tk, master, draw_game)
+
 
 def draw_game():
+
+        global sug_x, sug_y, rorx, rory
+
         # checks if there is a door on each side of the room
         left, right, bot, top = room_walls(layro.map_x, layro.map_y)
 
@@ -138,17 +270,17 @@ def draw_game():
             game_win.delete("wall")
 
             # draws the walls with no doors first, then checks if there's doors and draws the walls if not
-            game_win.create_line(0, 0, 250, 0, fill="white")
-            game_win.create_line(450, 0, 800, 0, fill="white")
+            game_win.create_line(0, 0, 250, 0, fill="white", tags="wall")
+            game_win.create_line(450, 0, 800, 0, fill="white", tags="wall")
 
-            game_win.create_line(0, 479, 250, 479, fill="white")
-            game_win.create_line(450, 479, 800, 479, fill="white")
+            game_win.create_line(0, 479, 250, 479, fill="white", tags="wall")
+            game_win.create_line(450, 479, 800, 479, fill="white", tags="wall")
 
-            game_win.create_line(0, 0, 0, 180, fill="white")
-            game_win.create_line(0, 300, 0, 479, fill="white")
+            game_win.create_line(0, 0, 0, 180, fill="white", tags="wall")
+            game_win.create_line(0, 300, 0, 479, fill="white", tags="wall")
 
-            game_win.create_line(699, 0, 699, 180, fill="white")
-            game_win.create_line(699, 300, 699, 479, fill="white")
+            game_win.create_line(699, 0, 699, 180, fill="white", tags="wall")
+            game_win.create_line(699, 300, 699, 479, fill="white", tags="wall")
 
             if not top_d or layro.map_y == 0:
                 top_wall = game_win.create_line(250, 0, 450, 0, fill="white", tags="wall")
@@ -175,7 +307,7 @@ def draw_game():
         # makes layro
         dude = game_win.create_text(layro.posx, layro.posy, text="☺", fill="white", tags="dude")
 
-        # places the console, game, map labelers. Are these even necessary? we might want the screen space more
+        # places the console, game, map labeler s. Are these even necessary? we might want the screen space more
         msg0.place(relx=.035, rely=-0.005)
         msg1.place(relx=.92, rely=-0.005)
         msg2.place(relx=.45, rely=-0.005)
@@ -183,10 +315,6 @@ def draw_game():
         health.place(relx=.89, rely=.26)
         locations.place(relx=.89, rely=.3)
         controls1.place(relx=.89, rely=.34)
-
-        # Where the game loop starts, above is initialization and stuff
-
-        game = True
 
         # Different "suggestions", which layro will ignore if they're high enough level
 
@@ -261,15 +389,20 @@ def draw_game():
                                                                       fill=enemies[len(enemies) - 1].color,
                                                                       tags=("enemy", "room-specific",)))
 
+        def change_floors():
+            for x_pos in range(len(dungeon_map)):
+                for y_pos, room in enumerate(dungeon_map[x_pos]):
+                    room.set_discovered(False)
+            player_map.delete("room")
+            change_rooms()
+
         # Binds all the buttons in settings.txt to their respective commands
         master.bind(move_to_butt, move_to)
         master.bind(attack_this_butt, attack)
         master.bind(interact_with, interact)
 
-        while game:
-
-            tm.sleep(.01)
-
+        def game_loop():
+            global rorx_inc, rory_inc, rorx, rory
             for z, q in zip(enemies, enemy_sprites):
                 try:
                     if z.map_x == layro.map_x and z.map_y == layro.map_y:
@@ -314,7 +447,55 @@ def draw_game():
                     game_win.delete("target")
                     change_rooms()
 
-            game_win.update()
+            # for y in range(len(dungeon_map)):
+            #     for x in range(len(dungeon_map[y])):
+            #         if dungeon_map[y][x].room_type == 3:
+            #             layro.map_y, layro.map_x = y, x
+
+            if dungeon_map[layro.map_y][layro.map_x].room_type == 3:
+                rec_x = master.winfo_width() / 3
+                rec_y = master.winfo_height() / 2
+
+                if rorx > 20:
+                    if ra.randint(0, 6) > 3 or rorx > 25:
+                        rorx_inc = False
+                if rorx < 0:
+                    if ra.randint(0, 6) > 3:
+                        rorx_inc = True
+
+                if rorx_inc:
+                    rorx += 1
+                if not rorx_inc:
+                    rorx -= 1
+
+                if rory > 20:
+                    if ra.randint(0, 6) > 3 or rory > 25:
+                        rory_inc = False
+                if rory < 0:
+                    if ra.randint(0, 6) > 3:
+                        rory_inc = True
+
+                if rory_inc:
+                    rory += 1
+                if not rory_inc:
+                    rory -= 1
+
+                if len(game_win.find_withtag("exit")) == 0:
+                    game_win.create_rectangle(rec_x + rorx, rec_y + rory, rec_x - rorx, rec_y - rory,
+                                              outline="#e5b329", tags=("exit", "room-specific"))
+                if not len(game_win.find_withtag("exit")) == 0:
+                    game_win.coords("exit", rec_x + rorx, rec_y + rory, rec_x - rorx, rec_y - rory)
+
+                if dude in game_win.find_overlapping(game_win.coords("exit")[0],
+                                                     game_win.coords("exit")[1],
+                                                     game_win.coords("exit")[2],
+                                                     game_win.coords("exit")[3]):
+                    regenerate(8, 8)
+                    change_floors()
+
+            master.after(10, game_loop)
+
+        game_loop()
 
 
 def dis_options():
@@ -356,6 +537,10 @@ console_size = 10
 map_size = 10
 game_size = 10
 
+sug_x, sug_y = 0, 0
+rorx, rory = 20, 20
+rorx_inc, rory_inc = False, False
+
 msg0 = tk.Message(master)
 msg1 = tk.Message(master)
 msg2 = tk.Message(master)
@@ -364,7 +549,7 @@ title_screen = tk.Message(master, text="The Game You Don't Play", bg="black",
                           fg="white", font=32, padx="0", justify="center")
 
 button = tk.Button(master, text='Play', width=25, activebackground="black",
-                   activeforeground="white", command=draw_game)
+                   activeforeground="white", command=before_game)
 
 options_butt = tk.Button(master, text='Options', width=25, activebackground="black",
                          activeforeground="white", command=dis_options)

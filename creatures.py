@@ -14,8 +14,13 @@ class Hero:
     health = 100
     attack = 5
     defense = 10
+    equipped_weapon = "nothing"
+    equipped_armor = "nothing"
+    equipped_access = "nothing"
+    # can be one_square, surrounding, or range
+    attack_type = "one_square"
 
-    def __init__(self, x, y):
+    def __init__(self, x, y, *args):
 
         self.map_x = x
         self.map_y = y
@@ -182,6 +187,7 @@ class Goblin:
                     att_x = (game_win.coords("attack")[0] + game_win.coords("attack")[2]) / 2
                     att_y = (game_win.coords("attack")[1] + game_win.coords("attack")[3]) / 2
 
+
 class Shade:
     symbol = "S"
     type = "Shade"
@@ -216,6 +222,7 @@ class Shade:
         if self.target_x + self.speed > self.proj_x > self.target_x - self.speed and self.target_y + self.speed > self.proj_y > self.target_y - self.speed:
             self.projectile = False
             game_win.delete(proj)
+
         else:
             up, down, left, right = False, False, False, False
 
@@ -255,8 +262,8 @@ class Shade:
 
         if self.timer == 160:
             global proj
-            proj = game_win.create_text(self.xpos, self.ypos, text=".",
-                                        fill="#c47266", tags="shade-projectile")
+            proj = game_win.create_text(self.xpos, self.ypos, text="O",
+                                        fill="#c47266", tags=("shade-projectile","room-specific"), font=("times", 10))
             self.target_x = game_win.coords(dude)[0]
             self.target_y = game_win.coords(dude)[1]
             self.projectile = True
@@ -264,10 +271,16 @@ class Shade:
         if self.projectile:
             self.proj_move(dude, game_win, layro)
             game_win.coords(proj, self.proj_x, self.proj_y)
+        else:
+            self.proj_x, self.proj_y = self.xpos, self.ypos
 
         if self.timer == 250:
             game_win.itemconfig(ghost, fill="#c47266")
-            self.xpos, self.ypos = ra.randint(5, 430), ra.randint(5, 500)
+            self.xpos, self.ypos = ra.randint(50, 340), ra.randint(50, 450)
             game_win.coords(ghost, self.xpos, self.ypos)
             self.timer = 0
             self.visible = True
+
+
+
+
