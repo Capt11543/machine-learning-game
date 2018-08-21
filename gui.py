@@ -45,6 +45,7 @@ except FileNotFoundError:
     file.write("interact_with: D\n")
     file.write("x_offset: -185\n")
     file.write("y_offset: -20\n")
+    file.write("startup: True\n")
     file = open(os.path.join(setting_path, "setting.txt"), "r+")
 
 
@@ -82,7 +83,9 @@ if startup:
 
     def start_up(*args):
         master.bind("<Return>", start_up)
+
         global times, file
+
         times += 1
         if times == 1:
             global startup_window, layro_startup, fake_window, plus, layro_startupp
@@ -178,6 +181,7 @@ if startup:
 
     start_up()
     file.close()
+
 
 
 # FIXME: not sure why the above is in gui, is there a better place?
